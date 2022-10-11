@@ -18,6 +18,8 @@ class RingBuffer:
     def __init__(self):
         self.max = FPS*SECOND
         self.data = []
+        self.take_picture = False
+        self.save_video = False
 
     class __Full:
         """ class that implements a full buffer """

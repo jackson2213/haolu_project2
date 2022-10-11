@@ -49,6 +49,7 @@ class HKCManage:
             makedirs(img_dir)
         self.buff = RingBuffer()
         threading.Thread(target=self.videotape_buff).start()
+        threading.Thread(target=self.take_picture).start()
         # 截图保存文件名
         self.img_path = path.join(img_dir, "{now}" + ".jpg")
         # 视频保存文件名
@@ -64,17 +65,20 @@ class HKCManage:
         try:
             # 打开rtsp
             cap = VideoCapture(self.USB_URL)
-            ret, frame = cap.read()
-            img_name= self.img_path.format( now=fmt_date(fmt=FMT_DATETIME))
-            consoleLog(self.logPre, "start take picture")
+            consoleLog(self.logPre, "start take picture thread")
             size = (int(cap.get(CAP_PROP_FRAME_WIDTH)), int(cap.get(CAP_PROP_FRAME_HEIGHT)))
             # 帧率
             fps = cap.get(CAP_PROP_FPS)
             print("{},{}".format(size, fps))
-            if not ret:
-                consoleLog(self.logPre, "no frame")
-
-            imencode('.jpg', frame)[1].tofile(img_name)
+            while True:
+                if self.buff.take_picture == True:
+                    img_name = self.img_path.format(now=fmt_date(fmt=FMT_DATETIME))
+                    consoleLog(self.logPre, "start take picture {}".format(img_name))
+                    ret, frame = cap.read()
+                    if not ret:
+                        consoleLog(self.logPre, "no frame")
+                    imencode('.jpg', frame)[1].tofile(img_name)
+                    self.buff.take_picture = False
         except Exception as e:
             consoleLog(self.logPre, "save picture exception:", repr(e))
         finally:
@@ -99,6 +103,9 @@ class HKCManage:
             fps = cap.get(CAP_PROP_FPS)
             print("{},{}".format(size,fps))
             while ret:
+                if self.buff.save_video ==True:
+                    self.videotape_save()
+                    self.buff.save_video =False
                 ret, frame = cap.read()
                 self.buff.append(frame)
             else:
@@ -127,8 +134,7 @@ class HKCManage:
             video_name = self.video_path.format(now=fmt_date(fmt=FMT_DATETIME))
             consoleLog(self.logPre, "save video:{}".format(video_name))
             outfile = VideoWriter(video_name,fourcc, 25, size)
-            for frame in frames:
-                outfile.write(frame)
+            outfile.write(frames)
 
         except Exception as e:
             consoleLog(self.logPre, "save video exception:", repr(e))
