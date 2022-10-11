@@ -41,7 +41,7 @@ class HKCManage:
         :param logPre:
         """
         self.logPre = logPre
-        self.USB_URL=1
+        self.USB_URL=0
         self.URL = f"rtsp://{user}:{pwd}@{ip}:{port}/Streaming/Channels/1"
         # 截图或视频保存位置
         img_dir = path.join(BASE_DIR, "logs", "camera_img", place, fmt_date(fmt=FMT_DATE))
@@ -66,17 +66,17 @@ class HKCManage:
             cap = VideoCapture(self.USB_URL,cv2.CAP_DSHOW)
             ret, frame = cap.read()
             img_name= self.img_path.format( now=fmt_date(fmt=FMT_DATETIME))
-            consoleLog(self.logPre, "开始拍照")
+            consoleLog(self.logPre, "start take picture")
             size = (int(cap.get(CAP_PROP_FRAME_WIDTH)), int(cap.get(CAP_PROP_FRAME_HEIGHT)))
             # 帧率
             fps = cap.get(CAP_PROP_FPS)
             print("{},{}".format(size, fps))
             if not ret:
-                consoleLog(self.logPre, "未捕获到帧")
+                consoleLog(self.logPre, "no frame")
 
             imencode('.jpg', frame)[1].tofile(img_name)
         except Exception as e:
-            consoleLog(self.logPre, "保存截图异常:", repr(e))
+            consoleLog(self.logPre, "save picture exception:", repr(e))
         finally:
             if cap:
                 cap.release()
@@ -91,7 +91,7 @@ class HKCManage:
         """
         try:
             # 打开rtsp
-            consoleLog(self.logPre, "开始录制")
+            consoleLog(self.logPre, "start record")
             cap = VideoCapture(self.URL)
             ret, frame = cap.read()
             size = (int(cap.get(CAP_PROP_FRAME_WIDTH)), int(cap.get(CAP_PROP_FRAME_HEIGHT)))
@@ -102,9 +102,9 @@ class HKCManage:
                 ret, frame = cap.read()
                 self.buff.append(frame)
             else:
-                consoleLog(self.logPre, "未捕获到帧")
+                consoleLog(self.logPre, "no frame")
         except Exception as e:
-            consoleLog(self.logPre, "视频录制异常:", repr(e))
+            consoleLog(self.logPre, "record video exception:", repr(e))
         finally:
             if cap:
                 cap.release()
@@ -125,13 +125,13 @@ class HKCManage:
             # 视频保存obj
             frames = copy.deepcopy(self.buff.get())
             video_name = self.video_path.format(now=fmt_date(fmt=FMT_DATETIME))
-            consoleLog(self.logPre, "保存视频:{}".format(video_name))
+            consoleLog(self.logPre, "save video:{}".format(video_name))
             outfile = VideoWriter(video_name,fourcc, 25, size)
             for frame in frames:
                 outfile.write(frame)
 
         except Exception as e:
-            consoleLog(self.logPre, "视频录制异常:", repr(e))
+            consoleLog(self.logPre, "save video exception:", repr(e))
         finally:
             if outfile:
                 outfile.release()
