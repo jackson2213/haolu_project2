@@ -41,7 +41,7 @@ class HKCManage:
         :param logPre:
         """
         self.logPre = logPre
-        self.USB_URL=0
+        self.USB_URL=1  #usb3.0的任意一个口
         self.URL = f"rtsp://{user}:{pwd}@{ip}:{port}/Streaming/Channels/1"
         # 截图或视频保存位置
         img_dir = path.join(BASE_DIR, "logs", "camera_img", place, fmt_date(fmt=FMT_DATE))
@@ -63,7 +63,7 @@ class HKCManage:
         """
         try:
             # 打开rtsp
-            cap = VideoCapture(self.USB_URL,cv2.CAP_DSHOW)
+            cap = VideoCapture(self.USB_URL)
             ret, frame = cap.read()
             img_name= self.img_path.format( now=fmt_date(fmt=FMT_DATETIME))
             consoleLog(self.logPre, "start take picture")
