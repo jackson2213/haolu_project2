@@ -16,7 +16,7 @@ if __name__ == "__main__":
     ringbuff= RingBuffer()
     ringbuff.take_picture=True
     ringbuff.save_video=True
-    time.sleep(20)
+    time.sleep(40)
     ringbuff.take_picture = True
     ringbuff.save_video = True
     time.sleep(1000)
