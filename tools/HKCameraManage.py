@@ -54,7 +54,7 @@ class HKCManage:
         # 视频保存文件名
         self.video_path = path.join(img_dir, "{now}" + ".mp4")
 
-    def get_screenshot(self, show_view=False):
+    def take_picture(self):
         """
         截图一帧
         :param carNo:
@@ -65,15 +65,16 @@ class HKCManage:
             # 打开rtsp
             cap = VideoCapture(self.USB_URL,cv2.CAP_DSHOW)
             ret, frame = cap.read()
+            img_name= self.img_path.format( now=fmt_date(fmt=FMT_DATETIME))
+            consoleLog(self.logPre, "开始拍照")
+            size = (int(cap.get(CAP_PROP_FRAME_WIDTH)), int(cap.get(CAP_PROP_FRAME_HEIGHT)))
+            # 帧率
+            fps = cap.get(CAP_PROP_FPS)
+            print("{},{}".format(size, fps))
             if not ret:
                 consoleLog(self.logPre, "未捕获到帧")
 
-            imencode('.jpg', frame)[1].tofile(self.img_path.format( now=fmt_date(fmt=FMT_DATETIME)))
-            if show_view:
-                # 预览窗口
-                namedWindow('view', WINDOW_NORMAL | WINDOW_KEEPRATIO)
-                imshow("view", frame)
-                waitKey(5 * 1000)
+            imencode('.jpg', frame)[1].tofile(img_name)
         except Exception as e:
             consoleLog(self.logPre, "保存截图异常:", repr(e))
         finally:
@@ -93,6 +94,10 @@ class HKCManage:
             consoleLog(self.logPre, "开始录制")
             cap = VideoCapture(self.URL)
             ret, frame = cap.read()
+            size = (int(cap.get(CAP_PROP_FRAME_WIDTH)), int(cap.get(CAP_PROP_FRAME_HEIGHT)))
+            # 帧率
+            fps = cap.get(CAP_PROP_FPS)
+            print("{},{}".format(size,fps))
             while ret:
                 ret, frame = cap.read()
                 self.buff.append(frame)

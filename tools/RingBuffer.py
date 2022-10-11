@@ -47,8 +47,8 @@ class RingBuffer:
 # sample usage
 # sample usage
 
-if __name__=='__main__':
-    pass
+# if __name__=='__main__':
+#     pass
 
     # x=RingBuffer()
     # x.append(1)
