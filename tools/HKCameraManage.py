@@ -20,6 +20,7 @@ from tools.RingBuffer import RingBuffer
 BASE_DIR = path.dirname(path.dirname(path.abspath(__file__)))
 import threading
 import copy
+import gc
 
 def consoleLog(*args):
     print(*args)
@@ -138,6 +139,8 @@ class HKCManage:
                     for frame in frames:
                         outfile.write(frame)
                     consoleLog(self.logPre, "save video finish")
+                    del frames
+                    gc.collect()
 
         except Exception as e:
             consoleLog(self.logPre, "save video exception:", repr(e))
